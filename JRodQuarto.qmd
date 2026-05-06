@@ -179,7 +179,7 @@ But we have a problem, xwOBA tends to have a lot of 0 values because of strikeou
 #| warning: false
 #| message: false
 #|output: FALSE
-
+set.seed(119)
 par(mfrow = c(1, 3))
 hist(jrod_ab$xwoba_continuous,
      breaks = 40, main = "xwOBA raw", xlab = "xwOBA",
