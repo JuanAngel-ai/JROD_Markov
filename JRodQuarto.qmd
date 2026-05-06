@@ -133,15 +133,15 @@ jrod_ab = jrod_data %>%
   )
 ```
 
-From all the variables we have the most important is `estimated_woba_using_speedangle`, which is the expected wOBA based on the launch speed and angle of the batted ball. This variable gives us a good indication of how well Julio Rodríguez is performing in terms of his ability to get on base and hit for power. 
+From all the variables we have the most important one is `estimated_woba_using_speedangle`, which is the xwOBA. This variable gives us a good indication of how well Julio Rodríguez is performing in terms of his ability to get on base and hit for power. 
 
-However this variable is only available for plate appearances where Julio made contact with the ball. For plate appearances where he did not make contact (e.g., strikeouts, walks, hit-by-pitch), we will need to assign a wOBA value based on the type of outcome. 
+However this variable is only available for plate appearances where Julio made contact with the ball. For plate appearances where he did not make contact (e.g., strikeouts, walks, hit-by-pitch), we will need to assign a xwOBA value based on the type of outcome. 
 
 To assess this problem, we create a new variable called `xwoba_continuous` which assigns fixed weights to different types of outcomes. For example, strikeouts are assigned a value of 0.00, walks are assigned a value of 0.69, and hit-by-pitch is assigned a value of 0.72 (this values were assigned based on historical data). This way we can have a continuous metric that captures the overall performance of Julio Rodríguez across all plate appearances, not just those where he made contact with the ball. 
 
 ## Rolling HMM Fit
 
-Because we want to measure a streak, we need to use a rolling average of xwOBA as the input for our HMM. This will help us smooth out the noise and capture the underlying performance trends over time. We will use a 25-PA rolling average, which is a common choice in baseball analytics for capturing short-term performance trends while still providing enough data points for the model to learn from. This is because a player will usually have around 4-5 plate appearances per game, so a 25-PA rolling average will capture performance over approximately 5-6 games, which is a reasonable window for detecting streaks without being too short-term or too long-term.
+Because we want to measure a streak and not only individual plates appearances, we need to use a rolling average of xwOBA as the input for our HMM. This will help us smooth out the noise and capture the underlying performance trends over time. We will use a 25-PA (plate appearance) rolling average, which is a common choice in baseball analytics for capturing short-term performance trends while still providing enough data points for the model to learn from. We use 25 because a player will usually have around 4-5 plate appearances per game, so a 25-PA rolling average will capture performance over approximately 5-6 games, which is a reasonable window for detecting streaks without being too short-term or too long-term focused.
 
 ```{r}
 #| warning: false
@@ -171,7 +171,7 @@ pa_counts_roll = jrod_hmm_data %>%
 
 ## Pre HMM Diagnostics
 
-In other to establish a proper HMM model, we need to check the distribution of our input variable (the rolling xwOBA) to see if it meets the assumptions of the model. HMMs typically assume that the observations are generated from a mixture of distributions (e.g., Gaussian), so we need to check for normality, skewness, and the presence of outliers in our rolling xwOBA data.
+In order to establish a proper HMM model, we need to check the distribution of our input variable (the rolling xwOBA) to see if it meets the assumptions of the model. HMMs typically assume that the observations are generated from a mixture of distributions (e.g., Gaussian), so we need to check for normality, skewness, and the presence of outliers in our rolling xwOBA data.
 
 But we have a problem, xwOBA tends to have a lot of 0 values because of strikeouts which can violate the normality assumption of the HMM. Fortunately, the Central Limit Theorem comes to the rescue here, as the rolling average of xwOBA will be less skewed and more normally distributed than the raw xwOBA values. However, we will still check the distribution of both the raw and rolling xwOBA to confirm this.
 
@@ -214,11 +214,11 @@ par(mfrow = c(1, 1))
 shapiro.test(sample(jrod_hmm_data$xwoba_roll25, 500))
 ```
 
-As we predicted, the Central Limit Theorem helps us here, as the rolling xwOBA is much less skewed and more normally distributed than the raw xwOBA values. The histogram of the rolling xwOBA shows a more bell-shaped distribution, and the QQ plot indicates that the rolling xwOBA points are closer to the normal line compared to the raw xwOBA.
+As we predicted, the Central Limit Theorem comes to the rescue here, as the rolling xwOBA is much less skewed and more normally distributed than the raw xwOBA values. The histogram of the rolling xwOBA shows a more bell-shaped distribution, and the QQ plot indicates that the rolling xwOBA points are closer to the normal line compared to the raw xwOBA. We also compute a Shapiro-Wilk test to test the normality.
 
 ## Model Selection (AIC/BIC)
 
-Now we have to define which states we should use for our HMM. We will try models with 2 to 5 states and compare their AIC and BIC values to find the best fit. The model with the lowest AIC/BIC will be considered the best model for our data.
+Now we have to define which states we should use for our HMM. We will try models with 2 to 5 states and compare their AIC and BIC values to find the best fit.
 
 ```{r}
 #| warning: false
