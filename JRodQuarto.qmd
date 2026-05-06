@@ -18,7 +18,7 @@ format:
 
 ## Introduction
 
-Julio Rodríguez is considered one of the most promising young players in Major League Baseball (MLB). He was ranked as best player at his position (Center Fielder) for the upcoming MLB season and 16th overall by mlb.com. However, media and fans alike claim that Julio usually underperforms during the first half of the season and then explodes in the second half. The question is: Is there any truth to this claim? Or is it just a case of confirmation bias?
+Julio Rodríguez is considered one of the most promising young players in Major League Baseball (MLB). He was ranked as the best player at his position (Center Fielder) for the upcoming MLB season and 16th overall by mlb.com. However, media and fans alike claim that Julio usually underperforms during the first half of the season and then explodes in the second half. The question is: Is there any truth to this claim? Or is it just a case of confirmation bias?
 
 ![](5Q2UBXIVUZOXZK2F2ZMEJ43YZE.jpg)
 
