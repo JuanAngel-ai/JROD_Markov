@@ -26,7 +26,7 @@ To answer this question, we will use Hidden Markov Models (HMMs) to analyze Juli
 
 The difference between wOBA and xwOBA is that wOBA is based on the actual outcomes of plate appearances (e.g., walks, singles, doubles, etc.), while xwOBA is based on the expected outcomes derived from the quality of contact (e.g., launch speed and angle). This means that xwOBA can provide a more nuanced view of a player's performance by accounting for the underlying quality of their batted balls, rather than just the results.
 
-The expected weighted on-base average ($xwOBA$) is defined as:
+The expected weighted on-base average (xwOBA) is defined as:
 $$
 xwOBA = \frac{w_{BB} \cdot BB + w_{HBP} \cdot HBP + w_{1B} \cdot 1B + w_{2B} \cdot 2B + w_{3B} \cdot 3B + w_{HR} \cdot HR}{AB + BB - IBB + SF + HBP}
 $$
