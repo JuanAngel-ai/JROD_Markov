@@ -139,9 +139,9 @@ However this variable is only available for plate appearances where Julio made c
 
 To assess this problem, we create a new variable called `xwoba_continuous` which assigns fixed weights to different types of outcomes. For example, strikeouts are assigned a value of 0.00, walks are assigned a value of 0.69, and hit-by-pitch is assigned a value of 0.72 (this values were assigned based on historical data). This way we can have a continuous metric that captures the overall performance of Julio Rodríguez across all plate appearances, not just those where he made contact with the ball. 
 
-## Rolling HMM Fit
+## Rolling HMM 
 
-Because we want to measure a streak and not only individual plates appearances, we need to use a rolling average of xwOBA as the input for our HMM. This will help us smooth out the noise and capture the underlying performance trends over time. We will use a 25-PA (plate appearance) rolling average, which is a common choice in baseball analytics for capturing short-term performance trends while still providing enough data points for the model to learn from. We use 25 because a player will usually have around 4-5 plate appearances per game, so a 25-PA rolling average will capture performance over approximately 5-6 games, which is a reasonable window for detecting streaks without being too short-term or too long-term focused.
+Because we want to measure a streak and not only individual plates appearances, we need to use a rolling average of xwOBA as the input for our HMM. This will help us smooth out the noise and capture the underlying performance trends over time. We will use a 25-PA (plate appearance) rolling average, which is a common choice in baseball analytics for capturing short-term performance trends while still providing enough data points for the model to learn from, creating a new variable called `xwoba_roll25`. We use 25 because a player will usually have around 4-5 plate appearances per game, so a 25-PA rolling average will capture performance over approximately 5-6 games, which is a reasonable window for detecting streaks without being too short-term or too long-term focused.
 
 ```{r}
 #| warning: false
@@ -171,9 +171,9 @@ pa_counts_roll = jrod_hmm_data %>%
 
 ## Pre HMM Diagnostics
 
-In order to establish a proper HMM model, we need to check the distribution of our input variable (the rolling xwOBA) to see if it meets the assumptions of the model. HMMs typically assume that the observations are generated from a mixture of distributions (e.g., Gaussian), so we need to check for normality, skewness, and the presence of outliers in our rolling xwOBA data.
+In order to establish a proper HMM model, we need to check the distribution of xwOBA and rolling xwOBA to see if they meet the assumptions of the model. HMMs typically assume that the observations are generated from a mixture of distributions (e.g., Gaussian), so we need to check for normality, skewness, and the presence of outliers in our rolling xwOBA data.
 
-But we have a problem, xwOBA tends to have a lot of 0 values because of strikeouts which can violate the normality assumption of the HMM. Fortunately, the Central Limit Theorem comes to the rescue here, as the rolling average of xwOBA will be less skewed and more normally distributed than the raw xwOBA values. However, we will still check the distribution of both the raw and rolling xwOBA to confirm this.
+But we have a problem, xwOBA tends to have a lot of 0 values because of strikeouts which can violate the normality assumption of the HMM. Fortunately, the Central Limit Theorem comes to the rescue here, as the rolling average of xwOBA (which is the metric we are going to use) will be less skewed and more normally distributed than the raw xwOBA values. However, we will still check the distribution of both the raw and rolling xwOBA to confirm this.
 
 ```{r}
 #| warning: false
@@ -294,7 +294,7 @@ jrod_hmm_data$state_roll = viterbi(fit_roll)$state
 
 ## Dynamic State Mapping
 
-After fitting our HMM model, we have assigned each plate appearance to one of three hidden states (state_roll). However, these states are currently labeled as 1, 2, and 3, which doesn't provide any intuitive understanding of what they represent in terms of performance. To make the states more interpretable, we will calculate the mean rolling xwOBA for each state and assign labels dynamically based on their performance levels. We will label the states as "Cold", "Average", and "Hot" based on their mean rolling xwOBA values, with "Cold" representing the lowest mean xwOBA, "Average" representing the middle mean xwOBA, and "Hot" representing the highest mean xwOBA. This way, we can easily understand the performance level associated with each state when we visualize the results later on.
+After fitting our HMM model, we have assigned each plate appearance to one of three hidden states `state_roll`. However, these states are currently labeled as 1, 2, and 3, which doesn't provide any intuitive understanding of what they represent in terms of performance. To make the states more interpretable, we will calculate the mean rolling xwOBA for each state and assign labels dynamically based on their performance levels. We will label the states as "Cold", "Average", and "Hot" based on their mean rolling xwOBA values, with "Cold" representing the lowest mean xwOBA, "Average" representing the middle mean xwOBA, and "Hot" representing the highest mean xwOBA. This way, we can easily understand the performance level associated with each state when we visualize the results later on.
 
 ```{r}
 #| warning: false
